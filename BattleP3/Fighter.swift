@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+///Each Fighter is a Characer with a Weapon
 class Fighter:Character {
     private var lifeInTeam: Int
     private var speedInTeam: Int
@@ -16,7 +16,7 @@ class Fighter:Character {
     private var name: String
     private var weapon: Weapon
     private var boardBonus: [Bonus]
-    private var decreaseCumulate: Int
+    private var decreaseLifeCumulate: Int
     init(id:Character.Identifier) {
         self.dead = false
         self.lifeInTeam = 0
@@ -26,9 +26,10 @@ class Fighter:Character {
         self.name = "ERROR"
         self.weapon = Weapon(identifier: .none)
         self.boardBonus = []
-        self.decreaseCumulate = 0
+        self.decreaseLifeCumulate = 0
         super.init(identifier: id)
     }
+    ///Init for SpeedStarting
     init(id:Character.Identifier, name:String, weapon:Weapon) {
         self.dead = false
         self.lifeInTeam = 0
@@ -38,25 +39,13 @@ class Fighter:Character {
         self.name = name
         self.weapon = weapon
         self.boardBonus = []
-        self.decreaseCumulate = 0
+        self.decreaseLifeCumulate = 0
         super.init(identifier: id)
     }
 
-//MARK: BONUS
-    func addNewBonus() {
-        let bonus:Bonus = .init()
-        Display.printNewBonus(fighter:self, bonus: bonus)
-        boardBonus.append(bonus)
-    }
-    func cleanBonus() {
-        boardBonus.removeAll()
-    }
-    func getBonusBoard() -> [Bonus] {
-        return boardBonus
-    }
-//MARK: GET SET
+//MARK: - GET SET
     func setIsFinish() {
-        decreaseCumulate = 0
+        decreaseLifeCumulate = 0
         setDead(set: false)
         boardBonus.removeAll()
     }
@@ -79,14 +68,11 @@ class Fighter:Character {
     func setName(name:String) {
         self.name = name
     }
-    private func setDead(set:Bool) {
-        dead = set
-    }
     func isDead() -> Bool {
         return dead
     }
     func setDecreaseLife(set: Int) -> Bool {
-        decreaseCumulate += set
+        decreaseLifeCumulate += set
         lifeInTeam -= set
         if lifeInTeam <= 0 {
             dead = true
@@ -114,7 +100,22 @@ class Fighter:Character {
     func getDamageInTeam () -> Int {
         return damageInTeam
     }
-//MARK: CALCUL
+    private func setDead(set:Bool) {
+        dead = set
+    }
+//MARK: - ACTION
+    func addNewBonus() {
+        let bonus:Bonus = .init()
+        Display.printNewBonus(fighter:self, bonus: bonus)
+        boardBonus.append(bonus)
+    }
+    func cleanBonus() {
+        boardBonus.removeAll()
+    }
+    func getBonusBoard() -> [Bonus] {
+        return boardBonus
+    }
+//MARK: - CALCUL
     func calculFighter(fighter:Fighter) {
         var addLife:Int = 0
         var addDamage:Int = 0
@@ -129,7 +130,7 @@ class Fighter:Character {
                 addDamage += bonus.getValue()
             }
         }
-        fighter.lifeInTeam = fighter.getLifeCharacter()+addLife-decreaseCumulate
+        fighter.lifeInTeam = fighter.getLifeCharacter()+addLife-decreaseLifeCumulate
         fighter.damageInTeam = Int((fighter.getWeapon().getDamage()+fighter.getDamageCharacter())/2)+addDamage
         fighter.speedInTeam = Int((fighter.getSpeedCharacter()+fighter.getWeapon().getSpeedWeapon())/2)+addSpeed
         

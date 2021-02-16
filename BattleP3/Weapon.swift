@@ -6,7 +6,8 @@
 //
 
 import Foundation
-
+///Weapon equip each Fighter
+///Weapon board stored in class Game
 class Weapon {
     enum Identifier:CaseIterable {
         case none,needle,baton,knife,hammer,machete,sword,chopped,mass
@@ -26,7 +27,7 @@ class Weapon {
         self.damage = getDamageWeapon()
         self.speed = getSpeedWeapon()
     }
-//MARK: BOARD
+//MARK: - BOARD
     func fillBoard() -> [Weapon] {
         var board:[Weapon] = []
         for identifier in Weapon.Identifier.allCases {
@@ -35,7 +36,7 @@ class Weapon {
         }
         return board
     }
-//MARK: GET SET
+//MARK: - GET SET
     func getIdentifier() -> Identifier {
         return identifier
     }

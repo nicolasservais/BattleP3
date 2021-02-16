@@ -6,10 +6,9 @@
 //
 
 import Foundation
-
+/// To play the game, two Team are fighting
+/// Each team are constituted with three fighter
 class Team {
-    /// To play the game, two Team are fighting
-    /// Each team are constituted with three fighter
     enum Identifier {
         case none,teamA,teamB
     }
@@ -23,7 +22,7 @@ class Team {
         self.identifier = identifier
         boardFighters = []
     }
-// MARK: GET SET
+// MARK: - GET SET
     func setIsFinish() {
         for fighter in boardFighters {
             fighter.setIsFinish()
@@ -79,7 +78,7 @@ class Team {
     func getBoardFighters() -> [Fighter] {
         return boardFighters
     }
-// MARK: 
+// MARK: - ACTION
     func addNewFighter(fighter: Fighter) {
         boardFighters.append(fighter)
     }
@@ -92,7 +91,7 @@ class Team {
         }
         return false
     }
-// MARK: CALCUL
+// MARK: - CALCUL
     func calculTeam() {
         gameLife = 0
         for fighter in boardFighters {
@@ -100,7 +99,7 @@ class Team {
             gameLife += fighter.getLifeInTeamWithCalcul()
         }
     }
-// MARK: PRINT
+// MARK: - PRINT
     func getFrenchName(team: Team.Identifier) -> String {
         switch team {
         case .none: return "None"

@@ -6,7 +6,8 @@
 //
 
 import Foundation
-
+/// Character define base characteristic for Fighter.
+/// Character board stored in class Game
 class Character {
     enum Identifier:CaseIterable {
         case bird,chicken,duck,rabbit,ostrich,lion,horse,camel,elephant
@@ -29,7 +30,7 @@ class Character {
         self.speed = getSpeedCharacter()
         self.damage = getSpeedCharacter()
     }
-//MARK: BOARD
+//MARK: - BOARD
     func fillBoard() -> [Character] {
         var board:[Character] = []
         for identifier in Character.Identifier.allCases {
@@ -38,7 +39,7 @@ class Character {
         }
         return board
     }
-//MARK: GET SET
+//MARK: - GET SET
     func getIdentifier() -> Identifier {
         return identifier
     }

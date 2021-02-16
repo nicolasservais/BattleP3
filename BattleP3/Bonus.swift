@@ -6,34 +6,18 @@
 //
 
 import Foundation
-/// Generate with random a Bonus who modify one characteristic of a fighter (life or damage or speed with a value between 1...9)
+/// Generate with random a Bonus who modify one characteristic of a fighter (life or damage or speed with a value between 1...4)
 class Bonus {
     enum Identifier {
         case addLife,addSpeed,addDamage
     }
     private var identifier:Identifier = .addDamage
-    private var value:Int = 0//between 1...9 points
+    private var value:Int = 0//between 1...4 points
     init() {
         self.identifier = newIdentifier()
         self.value = newValue()
     }
-//MARK: NEW
-    func newIdentifier() -> Identifier {
-        switch Int.random(in: 0...2) {
-        case 0:
-            return .addDamage
-        case 1:
-            return .addLife
-        case 2:
-            return .addSpeed
-        default:
-            return .addLife
-        }
-    }
-    func newValue() -> Int {
-         return Int.random(in: 1...4)
-    }
-//MARK: GET SET
+//MARK: - GET SET
     func getIdentifier() -> Identifier {
         return identifier
     }
@@ -50,7 +34,7 @@ class Bonus {
             return "de force"
         }
     }
-//MARK: METHOD
+//MARK: - METHOD
     /// Who fighter win newBonus
     static func newBonus(teamA:Team, teamB:Team) -> Team {
         var teamWinner: Team = .init(identifier: .none)
@@ -82,4 +66,20 @@ class Bonus {
         }
     return teamWinner
     }
+//MARK: - NEW
+    private func newIdentifier() -> Identifier {
+            switch Int.random(in: 0...2) {
+            case 0:
+                return .addDamage
+            case 1:
+                return .addLife
+            case 2:
+                return .addSpeed
+            default:
+                return .addLife
+            }
+        }
+    private func newValue() -> Int {
+             return Int.random(in: 1...4)
+        }
 }
