@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/Nicolas/Documents/OpenClassrooms/P3/BattleP3/BattleP3.xcodeproj/Diagramme de classe simplifie&#x301;.pdf">
+   </FileRef>
+   <FileRef
+      location = "group:Description Jeu Battle P3.pdf">
+   </FileRef>
+   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

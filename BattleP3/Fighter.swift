@@ -8,15 +8,15 @@
 import Foundation
 
 class Fighter:Character {
-    private var lifeInTeam:Int
-    private var speedInTeam:Int
-    private var damageInTeam:Int
-    private var ready:Bool
-    private var dead:Bool
-    private var name:String
-    private var weapon:Weapon
-    private var boardBonus:[Bonus]
-
+    private var lifeInTeam: Int
+    private var speedInTeam: Int
+    private var damageInTeam: Int
+    private var ready: Bool
+    private var dead: Bool
+    private var name: String
+    private var weapon: Weapon
+    private var boardBonus: [Bonus]
+    private var decreaseCumulate: Int
     init(id:Character.Identifier) {
         self.dead = false
         self.lifeInTeam = 0
@@ -26,6 +26,7 @@ class Fighter:Character {
         self.name = "ERROR"
         self.weapon = Weapon(identifier: .none)
         self.boardBonus = []
+        self.decreaseCumulate = 0
         super.init(identifier: id)
     }
     init(id:Character.Identifier, name:String, weapon:Weapon) {
@@ -37,39 +38,55 @@ class Fighter:Character {
         self.name = name
         self.weapon = weapon
         self.boardBonus = []
+        self.decreaseCumulate = 0
         super.init(identifier: id)
-
     }
+
 //MARK: BONUS
     func addNewBonus() {
         let bonus:Bonus = .init()
-        printBonus(bonus: bonus)
+        Display.printNewBonus(fighter:self, bonus: bonus)
         boardBonus.append(bonus)
     }
     func cleanBonus() {
         boardBonus.removeAll()
     }
+    func getBonusBoard() -> [Bonus] {
+        return boardBonus
+    }
 //MARK: GET SET
+    func setIsFinish() {
+        decreaseCumulate = 0
+        setDead(set: false)
+        boardBonus.removeAll()
+    }
+    func isBonus() -> Bool {
+        if boardBonus.count != 0 {
+            return true
+        } else {
+            return false
+        }
+    }
     func getWeapon() -> Weapon {
         return weapon
     }
     func setWeapon(weapon:Weapon) {
         self.weapon = weapon
     }
-
     func getName() -> String {
         return self.name
     }
     func setName(name:String) {
         self.name = name
     }
-    func setDead(set:Bool) {
+    private func setDead(set:Bool) {
         dead = set
     }
     func isDead() -> Bool {
         return dead
     }
     func setDecreaseLife(set: Int) -> Bool {
+        decreaseCumulate += set
         lifeInTeam -= set
         if lifeInTeam <= 0 {
             dead = true
@@ -83,6 +100,10 @@ class Fighter:Character {
     }
     func getReady() -> Bool{
         return ready
+    }
+    func getLifeInTeamWithCalcul () -> Int {
+        calculFighter(fighter: self)
+        return lifeInTeam
     }
     func getLifeInTeam () -> Int {
         return lifeInTeam
@@ -108,19 +129,18 @@ class Fighter:Character {
                 addDamage += bonus.getValue()
             }
         }
-        
-        fighter.lifeInTeam = fighter.getLifeCharacter()+addLife
+        fighter.lifeInTeam = fighter.getLifeCharacter()+addLife-decreaseCumulate
         fighter.damageInTeam = Int((fighter.getWeapon().getDamage()+fighter.getDamageCharacter())/2)+addDamage
         fighter.speedInTeam = Int((fighter.getSpeedCharacter()+fighter.getWeapon().getSpeedWeapon())/2)+addSpeed
+        
+        if fighter.lifeInTeam < 0 {
+            fighter.lifeInTeam = 0
+            dead = true
+        }
         
         if fighter.lifeInTeam > 9 { fighter.lifeInTeam = 9 }
         if fighter.damageInTeam > 9 { fighter.damageInTeam = 9 }
         if fighter.speedInTeam > 9 { fighter.speedInTeam = 9 }
+        //print(fighter.getName(),fighter.getLifeCharacter(), addLife, fighter.getLifeInTeam())
     }
-//MARK: PRINT
-    func printBonus(bonus:Bonus) {
-        print("###################################################################################################")
-        print("\(self.getName()) \(self.getFrenchName()) vient de gagner \(bonus.getValue()) point(s) \(bonus.getIdentifier())")
-        print("###################################################################################################")
-        }
 }

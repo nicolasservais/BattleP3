@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 class Weapon {
     enum Identifier:CaseIterable {
         case none,needle,baton,knife,hammer,machete,sword,chopped,mass
@@ -13,11 +14,11 @@ class Weapon {
     enum Status {
         case free, notFree
     }
-    private var identifier:Identifier
-    private var damage:Int //between 0...10 points
-    private var speed:Int //between 0...10 points
-    private var status:Status
-    init(identifier:Identifier) {
+    private var identifier: Identifier
+    private var damage: Int //between 1...9 points
+    private var speed: Int //between 1...9 points
+    private var status: Status
+    init(identifier: Identifier) {
         self.identifier = identifier
         self.damage = 0
         self.speed = 0
@@ -47,7 +48,7 @@ class Weapon {
     func getStatus() -> Status {
         return status
     }
-    func setStatus(status:Status) {
+    func setStatus(status: Status) {
         self.status = status
     }
     func getDamageWeapon() -> Int {

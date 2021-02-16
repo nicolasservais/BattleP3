@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+/// Generate with random a Bonus who modify one characteristic of a fighter (life or damage or speed with a value between 1...9)
 class Bonus {
     enum Identifier {
         case addLife,addSpeed,addDamage
@@ -16,7 +16,6 @@ class Bonus {
     init() {
         self.identifier = newIdentifier()
         self.value = newValue()
-        
     }
 //MARK: NEW
     func newIdentifier() -> Identifier {
@@ -32,7 +31,7 @@ class Bonus {
         }
     }
     func newValue() -> Int {
-         return Int.random(in: 1...9)
+         return Int.random(in: 1...4)
     }
 //MARK: GET SET
     func getIdentifier() -> Identifier {
@@ -50,5 +49,37 @@ class Bonus {
         case .addDamage:
             return "de force"
         }
+    }
+//MARK: METHOD
+    /// Who fighter win newBonus
+    static func newBonus(teamA:Team, teamB:Team) -> Team {
+        var teamWinner: Team = .init(identifier: .none)
+        let fighterWinner: Fighter
+        if teamA.getGameLife() < teamB.getGameLife() {
+            if teamA.getGameLife() > 0 {
+                let difference: Int = teamB.getGameLife()-teamA.getGameLife()
+                if difference > 3 {
+                //if Int.random(in: 0...difference) >= teamA.getGameLife() {
+                    teamWinner = teamA
+                    fighterWinner = teamWinner.getFighter(number: Int.random(in: 0...2))
+                    if !fighterWinner.isDead() {
+                        fighterWinner.addNewBonus()
+                    }
+                }
+            }
+        } else if teamA.getGameLife() > teamB.getGameLife() {
+            if teamB.getGameLife() > 0 {
+                let difference: Int = teamA.getGameLife()-teamB.getGameLife()
+                //if Int.random(in: 0...difference) >= teamB.getGameLife() {
+                if difference > 3 {
+                    teamWinner = teamB
+                    fighterWinner = teamWinner.getFighter(number: Int.random(in: 0...2))
+                    if !fighterWinner.isDead() {
+                        fighterWinner.addNewBonus()
+                    }
+                }
+            }
+        }
+    return teamWinner
     }
 }

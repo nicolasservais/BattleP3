@@ -7,23 +7,31 @@
 
 import Foundation
 
-class Game {
+final class Game {
     enum Status {
         case none, makeTeam, battle, finish
     }
+    /// An array who stored all the characters of the game.
+    /// When a character is choosen by a team is not available for the other Team.
     static var boardCharacters: [Character] = []
+    /// An array who stored all the weapons of the game.
+    /// When a weapon is used, is not available for other fighter.
     static var boardWeapons: [Weapon] = []
-    var statusGame: Status
-    var teamActive: Team.Identifier
-    var lastTeamWinner: Team.Identifier
-    var teamA: Team
-    var teamB: Team
-    /// Description battle player TeamA
-    var battlePlayerTeamA: Fighter
-    var battlePlayerTeamB: Fighter
+    /// The two team who are fighting.
+    private var teamA: Team
+    private var teamB: Team
+    /// Stored the different phase of the game.
+    private var statusGame: Status
+    private var teamActive: Team.Identifier
+    private var lastTeamWinner: Team.Identifier
+    /// When the battle starting, the two battlePlayer are fighting.
+    private var battlePlayerTeamA: Fighter
+    private var battlePlayerTeamB: Fighter
     private var loopAddWeapon: Bool
     private var loopAddName: Bool
-    var boardNamesFighters: [String]
+    /// An array who stored all the names to control that not duplicate.
+    private var boardNamesFighters: [String]
+    private var round: Int
     init() {
         Game.boardCharacters = []
         Game.boardWeapons = []
@@ -37,11 +45,12 @@ class Game {
         teamB = Team.init(identifier: .teamB)
         battlePlayerTeamA = Fighter(id: .bird)
         battlePlayerTeamB = Fighter(id: .bird)
+        round = 0
         fillCharacters()
         fillWeapons()
     }
 
-// MARK: INITIALISATION
+// MARK: - INITIALISATION
     private func fillCharacters() {
         let character: Character = BattleP3.Character(identifier: .bird)
         Game.boardCharacters = character.fillBoard()
@@ -50,50 +59,66 @@ class Game {
         let weapon: Weapon = Weapon(identifier: .none)
         Game.boardWeapons = weapon.fillBoard()
         }
-
+    private func resetBoards() {
+        for character in Game.boardCharacters {
+            character.setStatus(status: .free)
+        }
+        for weapon in Game.boardWeapons {
+            weapon.setStatus(status: .free)
+        }
+        boardNamesFighters.removeAll()
+        teamA.resetBoard()
+        teamB.resetBoard()
+    }
 // MARK: - PHASE
-    func speedStart() {
+    private func speedStart() {
         if teamA.getCount() < 3 && teamB.getCount() < 3 {
-
             teamA.addNewFighter(fighter: .init(id: .bird, name: "Nicolas", weapon: .init(identifier: .baton)))
             teamA.addNewFighter(fighter: .init(id: .chicken, name: "Michel", weapon: .init(identifier: .hammer)))
             teamA.addNewFighter(fighter: .init(id: .elephant, name: "Marc", weapon: .init(identifier: .chopped)))
-
             teamB.addNewFighter(fighter: .init(id: .camel, name: "Olivier", weapon: .init(identifier: .machete)))
             teamB.addNewFighter(fighter: .init(id: .rabbit, name: "Guillaume", weapon: .init(identifier: .needle)))
             teamB.addNewFighter(fighter: .init(id: .duck, name: "Neo", weapon: .init(identifier: .knife)))
-
         }
-        // printCharactersFree()
+       // teamA.getFighter(number: 0).addNewBonus()
+/*        teamA.getFighter(number: 0).addNewBonus()
+        teamB.getFighter(number: 0).addNewBonus()
+        teamA.getFighter(number: 1).addNewBonus()
+        teamB.getFighter(number: 0).addNewBonus()
+        teamB.getFighter(number: 1).addNewBonus()
+        teamA.getFighter(number: 0).addNewBonus()
+        teamB.getFighter(number: 0).addNewBonus()
+        teamA.getFighter(number: 2).addNewBonus()
+        teamA.getFighter(number: 2).addNewBonus()
+*/        // printCharactersFree()
         // printWeaponsFree()
         // printBattle()
         teamA.calculTeam()
         teamB.calculTeam()
         // printTeamWinner()
         print("\(whoTeamStarting()) commence")
-//        teamActive = .TeamA
         statusGame = .battle
         startNewBattle()
-
     }
-    func startMenu() {
-        statusGame = .none
-        print(" ")
-        print("Que voulez vous faire ?")
-        print(" ")
-        if lastTeamWinner != .none && teamA.getCount() == 3 && teamB.getCount() == 3 {
-            print("play  : Rejouer la partie avec les mêmes équipes")
-        }
-        print("start : Nouvelle Partie")
-        print("equip : Voir les équipes")
-        print("stat  : Voir les statistiques")
-        print("reset : Initialise les statistiques")
-        print("exit  : Quitter")
-        if let string = readLine() {
-            parserMenu(string: string)
-        }
+    func menu() {
+    statusGame = .none
+    print(" ")
+    print("Que voulez vous faire ?")
+    print(" ")
+    if lastTeamWinner != .none && teamA.getCount() == 3 && teamB.getCount() == 3 {
+        print("play  : Rejouer la partie avec les mêmes équipes")
     }
-    func startNewGame() {
+    print("start : Nouvelle Partie")
+    print("equip : Voir les équipes")
+    print("stat  : Voir les statistiques")
+    print("reset : Initialise les statistiques")
+    print("exit  : Quitter")
+    if let string = readLine() {
+        parserMenu(string: string)
+    }
+}
+    private func startNewGame() {
+        round = 0
         print("Deux équipes (A et B) chacune composé de trois personnages vont se livrer un combat")
         print(" ")
         print("L'\(whoTeamStarting()) commence")
@@ -104,12 +129,12 @@ class Game {
             startNewBattle()
         }
     }
-    func startNewBattle() {
+    private func startNewBattle() {
         print("La bataille peux commencer !!!")
         Display.printBattle(teamA: teamA, teamB: teamB)
-        while (teamA.getGameLife() > 0 || teamB.getGameLife() > 0) && statusGame == .battle {
+        while (teamA.getGameLifeWithCalcul() > 0 || teamB.getGameLifeWithCalcul() > 0) && statusGame == .battle {
             var phrase: String = "L'\(teamA.getFrenchName(team: teamActive)) choisi un personnage : "
-            phrase.append("\(printPlayerAlive(team: teamActive)) ?")
+            phrase.append("\(Display.printPlayerAlive(teamActive: teamActive, teamA:teamA, teamB:teamB)) ?")
             print(phrase)
             if let numberCharacter = readLine() {
                 print(parserBattle(string: numberCharacter))
@@ -121,10 +146,16 @@ class Game {
             }
         }
     }
-    func battle() {
+    private func battle() {
+        round += 1
         battlePlayerTeamA.setReady(ready: false)
         battlePlayerTeamB.setReady(ready: false)
-            newBonus()
+        if Bonus.newBonus(teamA: teamA, teamB: teamB).getIdentifier() != .none {
+            teamA.calculTeam()
+            teamB.calculTeam()
+            Display.printBattle(teamA: teamA, teamB: teamB)
+        }
+        
         let choose: Int = Int.random(in: 0...battlePlayerTeamA.getSpeedInTeam()+battlePlayerTeamB.getSpeedInTeam())
         if choose <= battlePlayerTeamA.getSpeedInTeam() {
             Display.printFight(battlePlayerTeamA: battlePlayerTeamA, battlePlayerTeamB: battlePlayerTeamB)
@@ -138,12 +169,12 @@ class Game {
                 print(battlePlayerTeamB.getFrenchName(), " est mort !")
                 print(" ")
             }
-            if teamB.getGameLife() == 0 {
+            if teamB.getGameLifeWithCalcul() == 0 {
                 Display.printBattle(teamA: teamA, teamB: teamB)
-                setWinner(team: teamA)
                 print(" ")
                 print("L'équipe B a perdu")
                 print(" ")
+                setWinner(team: teamA)
             }
         } else {
             Display.printFight(battlePlayerTeamA: battlePlayerTeamA, battlePlayerTeamB: battlePlayerTeamB)
@@ -157,59 +188,27 @@ class Game {
                 print(battlePlayerTeamA.getFrenchName(), " est mort !")
                 print(" ")
             }
-            if teamA.getGameLife() == 0 {
+            if teamA.getGameLifeWithCalcul() == 0 {
                 Display.printBattle(teamA: teamA, teamB: teamB)
-                setWinner(team: teamB)
                 print(" ")
                 print("L'équipe A a perdu")
                 print(" ")
+                setWinner(team: teamB)
             }
         }
     }
-    func setWinner(team: Team) {
+    private func setWinner(team: Team) {
         statusGame = .finish
         lastTeamWinner = team.getIdentifier()
         team.setWinner(team: team)
-        teamA.setPlayersIsAlive()
-        teamB.setPlayersIsAlive()
-        teamA.calculTeam()
-        teamB.calculTeam()
-        Display.printTeamWinner(teamA: teamA, teamB: teamB)
-        startMenu()
+        teamA.setIsFinish()
+        teamB.setIsFinish()
+        Display.printTeamWinner(rounds:round, teamA: teamA, teamB: teamB)
+        statusGame = .none
+        menu()
     }
-    func resetBoards() {
-        for character in Game.boardCharacters {
-            character.setStatus(status: .free)
-        }
-        for weapon in Game.boardWeapons {
-            weapon.setStatus(status: .free)
-        }
-        boardNamesFighters.removeAll()
-        teamA.resetBoard()
-        teamB.resetBoard()
-    }
-    func newBonus() {
-        var teamWinner: Team = .init(identifier: .none)
-        let fighterWinner: Fighter
-        if teamA.getGameLife() < teamB.getGameLife() {
-            // if Int.random(in: 0...teamA.getGameLife()) == teamA.getGameLife() {
-            if Int.random(in: 0...teamA.getGameLife()) == teamA.getGameLife() {
-                teamWinner = teamA
-                fighterWinner = teamWinner.getFighter(number: Int.random(in: 0...2))
-                fighterWinner.addNewBonus()
-            }
-        } else if teamA.getGameLife() > teamB.getGameLife() {
-            // if Int.random(in: 0...teamB.getGameLife()) == teamB.getGameLife() {
-            if Int.random(in: 0...teamA.getGameLife()) == teamA.getGameLife() {
-                    teamWinner = teamB
-                fighterWinner = teamWinner.getFighter(number: Int.random(in: 0...2))
-                fighterWinner.addNewBonus()
-            }
-        }
-    }
-
 // MARK: - MAKE TEAM
-    func whoTeamStarting() -> String {
+    private func whoTeamStarting() -> String {
         switch lastTeamWinner {
         case .none:
             if Bool.random() {
@@ -224,8 +223,8 @@ class Game {
         }
         return teamA.getFrenchName(team: teamActive)
     }
-    func chooseTeams() -> Bool {
-        while !teamA.isComplete() && !teamB.isComplete() {
+    private func chooseTeams() -> Bool {
+        while teamA.getCount() < 3 && teamB.getCount() < 3 {
             Display.printCharactersFree()
             // printCharactersFree()
             print("\(teamA.getFrenchName(team: teamActive)) choisi un personnage")
@@ -241,10 +240,10 @@ class Game {
         teamB.calculTeam()
         return true
     }
-    func chooseWeapon(fighter: Fighter) {
+    private func chooseWeapon(fighter: Fighter) {
         loopAddWeapon = true
         while loopAddWeapon {
-            printWeaponsFree()
+            Display.printWeaponsFree()
             print("\(fighter.getName()) \(fighter.getFrenchName()) choisi une arme")
             if let numberWeapon = readLine() {
                 print(parserWeapon(fighter: fighter, string: numberWeapon))
@@ -253,7 +252,7 @@ class Game {
             }
         }
     }
-    func chooseName() -> String {
+    private func chooseNameFighter() -> String {
         loopAddName = true
         while loopAddName {
             var nameDuplicate: Bool = false
@@ -278,9 +277,8 @@ class Game {
         }
         return "ERROR"
     }
-
-// MARK: PARSER
-    func parserMenu(string: String) {
+// MARK: - PARSER
+    private func parserMenu(string: String) {
         if string == "start" {
             if statusGame == .none {
                 resetBoards()
@@ -291,6 +289,9 @@ class Game {
             }
         } else if string == "equip" {
             Display.printBattle(teamA: teamA, teamB: teamB)
+            if statusGame == .none || statusGame == .finish{
+                menu()
+            }
         } else if string == "play" {
             if teamA.isComplete() && teamB.isComplete() {
                 statusGame = .battle
@@ -306,22 +307,22 @@ class Game {
         } else if string == "exit" {
             if statusGame == .none {
                 print("Vous pouvez sortir du jeu à n'importe quel moment")
-                startMenu()
+                menu()
             } else {
                 print(parserExit())
             }
         } else if string == "stat" {
             if statusGame == .none {
                 print("Vous pouvez afficher les statistiques à n'importe quel moment")
-                Display.printTeamWinner(teamA: teamA, teamB: teamB)
-                startMenu()
+                Display.printTeamWinner(rounds:round, teamA: teamA, teamB: teamB)
+                menu()
             } else {
-                Display.printTeamWinner(teamA: teamA, teamB: teamB)
+                Display.printTeamWinner(rounds:round, teamA: teamA, teamB: teamB)
             }
         } else if string == "reset" {
             if statusGame == .none {
                 print("Vous pouvez réinitialiser le jeux à n'importe quel moment")
-                startMenu()
+                menu()
             } else {
                 print(parserInitStat())
             }
@@ -329,16 +330,16 @@ class Game {
             // print("SpeedStart")
             speedStart()
         } else if statusGame == .none {
-            startMenu()
+            menu()
         }
     }
-    func parserCharacter(string: String) -> (String) {
+    private func parserCharacter(string: String) -> (String) {
         if string.count == 1 {
             if string == "0" || string == "1"  || string == "2" || string == "3" || string == "4" || string == "5"
                 || string == "6" || string == "7" || string == "8" || string == "9" {
                 if let number = Int(string) {
                     let fighter: Fighter = Fighter(id: Game.boardCharacters[number].getIdentifier())
-                    fighter.setName(name: chooseName())
+                    fighter.setName(name: chooseNameFighter())
                     switch teamActive {
                     case .none:
                         break
@@ -370,7 +371,7 @@ class Game {
         }
         return "ERREUR"
     }
-    func parserWeapon(fighter: Fighter, string: String) -> (String) {
+    private func parserWeapon(fighter: Fighter, string: String) -> (String) {
         if string.count == 1 {
             if string == "0" || string == "1"  || string == "2" || string == "3" || string == "4" || string == "5"
                 || string == "6" || string == "7" || string == "8" || string == "9" {
@@ -384,13 +385,13 @@ class Game {
                                 if teamA.changeWeapon(fighter: fighter, weapon: Game.boardWeapons[number]) {
                                     Game.boardWeapons[number].setStatus(status: .notFree)
                                     loopAddWeapon = false
-                                    return teamA.printNewPlayerWithWeapon()
+                                    return Display.printNewPlayerWithWeapon(boardFighters: teamA.getBoardFighters())
                                 }
                             case .teamB:
                                 if teamB.changeWeapon(fighter: fighter, weapon: Game.boardWeapons[number]) {
                                     Game.boardWeapons[number].setStatus(status: .notFree)
                                     loopAddWeapon = false
-                                    return teamB.printNewPlayerWithWeapon()
+                                    return Display.printNewPlayerWithWeapon(boardFighters: teamB.getBoardFighters())
                                 }
                             }
                         } else {
@@ -404,7 +405,7 @@ class Game {
         }
         return "ERROR in parserWeapon"
     }
-    func parserBattle(string: String) -> (String) {
+    private func parserBattle(string: String) -> (String) {
         if string.count == 1 {
             if string == "0" || string == "1"  || string == "2" {
                 if let number = Int(string) {
@@ -413,7 +414,7 @@ class Game {
                         break
                     case .teamA:
                         if !battlePlayerTeamA.getReady() {
-                            if !teamA.getPlayerIsDead(set: number) {
+                            if !teamA.getFighterIsDead(set: number) {
                                 teamActive = .teamB
                                 battlePlayerTeamA = teamA.getFighter(number: number)
                                 battlePlayerTeamA.setReady(ready: true)
@@ -426,7 +427,7 @@ class Game {
                         }
                     case .teamB:
                         if !battlePlayerTeamB.getReady() {
-                            if !teamB.getPlayerIsDead(set: number) {
+                            if !teamB.getFighterIsDead(set: number) {
                                 teamActive = .teamA
                                 battlePlayerTeamB = teamB.getFighter(number: number)
                                 battlePlayerTeamB.setReady(ready: true)
@@ -446,14 +447,14 @@ class Game {
         }
         return "Je n'ai pas compris"
     }
-    func parserInitStat() -> (String) {
+    private func parserInitStat() -> (String) {
         print("Etes vous sur de vouloir initialiser les statistiques (O N) ?")
             if let string = readLine() {
                 if string.count == 1 {
                     if string == "O" || string == "o" {
                         teamA.resetWin()
                         teamB.resetWin()
-                        Display.printTeamWinner(teamA: teamA, teamB: teamB)
+                        Display.printTeamWinner(rounds:round, teamA: teamA, teamB: teamB)
                         return "Initialisation terminée"
                     } else if string == "N" || string == "n" {
                         return "Pas d'initialisation"
@@ -464,18 +465,16 @@ class Game {
         }
         return "Je n'ai pas compris"
     }
-    func parserExit() -> (String) {
+    private func parserExit() -> (String) {
         print("Etes vous sur de vouloir Sortir (O N) ?")
         if let string = readLine() {
             if string.count == 1 {
                 if string == "O" || string == "o" {
                     lastTeamWinner = teamActive
                     statusGame = .none
-                    teamA.setPlayersIsAlive()
-                    teamB.setPlayersIsAlive()
-                    teamA.calculTeam()
-                    teamB.calculTeam()
-                    startMenu()
+                    teamA.setIsFinish()
+                    teamB.setIsFinish()
+                    menu()
                     return ""
                 } else if string == "N" || string == "n" {
                     return "La partie continue"
@@ -483,49 +482,6 @@ class Game {
             }
         }
         return "Je n'ai pas compris"
-    }
-
-// MARK: PRINT
-    func printPlayerAlive(team: Team.Identifier) -> String {
-        var phrase: String = ""
-        var myTeam: Team = Team.init(identifier: .none)
-        switch team {
-        case .none:
-            break
-        case .teamA:
-            myTeam = teamA
-        case .teamB:
-            myTeam = teamB
-        }
-
-        for position in 0...2 {
-            if !myTeam.getPlayerIsDead(set: position) {
-                phrase.append("\(position)")
-                phrase.append(" ")
-            }
-        }
-        return phrase
-    }
-    func printWeaponsFree() {
-        if Game.boardWeapons.count > 0 {
-            print("*****************************************")
-            print("*\t\tNAME\t\t  Dégats  Vitesse\t*")
-            print("*****************************************")
-            for position in 0...Game.boardWeapons.count-1 {
-                let weapon: Weapon = Game.boardWeapons[position]
-                if weapon.getStatus() == .free {
-                    let nameWeapon = weapon.getFrenchName()
-                    let numberTab: Int = 3-Int(nameWeapon.count/4)
-                    var phrase: String = "*  \(position) :\t\(nameWeapon)"
-                    for _ in 0...numberTab {phrase.append("\t") }
-                    phrase.append("\(weapon.getDamage())")
-                    phrase.append("   \t\(weapon.getSpeed())\t\t*")
-                    print(phrase)
-                }
-            }
-            print("*****************************************")
-
-        }
     }
 }
 

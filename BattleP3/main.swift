@@ -10,9 +10,9 @@ import Foundation
 main()
 
 func main() {
-    let game:Game = Game()
+    let game: Game = Game()
     print("Bienvenue dans le jeu Battle P3 !")
-    game.startMenu()
+    game.menu()
 }
 
 

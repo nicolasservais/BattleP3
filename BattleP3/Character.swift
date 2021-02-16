@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 class Character {
     enum Identifier:CaseIterable {
         case bird,chicken,duck,rabbit,ostrich,lion,horse,camel,elephant
@@ -14,9 +15,9 @@ class Character {
         case free, notFree
     }
     private var identifier:Identifier
-    private var life:Int // between 0...10 points
-    private var speed:Int // between 0...10 points
-    private var damage:Int // between 0...10 points
+    private var life:Int // between 1...9 points
+    private var speed:Int // between 1...9 points
+    private var damage:Int // between 1...9 points
     private var status:Status
     init(identifier:Identifier) {
         self.identifier = identifier
@@ -24,7 +25,6 @@ class Character {
         self.speed = 0
         self.damage = 0
         self.status = .free
-
         self.life = getLifeCharacter()
         self.speed = getSpeedCharacter()
         self.damage = getSpeedCharacter()
@@ -142,6 +142,4 @@ class Character {
             return "l'Elephant"
         }
     }
-//MARK: PRINT
-
 }
