@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class Game {
+class Game {
     enum Status {
         case none, makeTeam, battle, finish
     }
@@ -31,8 +31,10 @@ final class Game {
     private var loopAddName: Bool
     /// An array who stored all the names to control that not duplicate.
     private var boardNamesFighters: [String]
+    /// Cumulate the battle round who is viewed at the end of a game.
     private var round: Int
-    init() {
+    init()
+    {
         Game.boardCharacters = []
         Game.boardWeapons = []
         statusGame = .none
@@ -125,6 +127,8 @@ final class Game {
         print(" ")
         statusGame = .makeTeam
         if chooseTeams() {
+            teamA.calculTeam()
+            teamB.calculTeam()
             statusGame = .battle
             startNewBattle()
         }
@@ -224,20 +228,18 @@ final class Game {
         return teamA.getFrenchName(team: teamActive)
     }
     private func chooseTeams() -> Bool {
-        while teamA.getCount() < 3 && teamB.getCount() < 3 {
+        repeat {
             Display.printCharactersFree()
-            // printCharactersFree()
             print("\(teamA.getFrenchName(team: teamActive)) choisi un personnage")
             if let numberCharacter = readLine() {
                 print(" ")
                 print(parserCharacter(string: numberCharacter))
+                print("teamACount:\(teamA.getCount()) teamBCount:\(teamB.getCount())")
                 print(" ")
             } else {
                 print("Je n'ai pas compris le choix du personnage")
             }
-        }
-        teamA.calculTeam()
-        teamB.calculTeam()
+        } while teamA.getCount() < 3 || teamB.getCount() < 3 //{
         return true
     }
     private func chooseWeapon(fighter: Fighter) {
