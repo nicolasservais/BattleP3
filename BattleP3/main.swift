@@ -14,9 +14,3 @@ func main() {
     print("Bienvenue dans le jeu Battle P3 !")
     game.menu()
 }
-
-
-
-
-
-

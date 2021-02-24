@@ -138,7 +138,7 @@ struct Display {
                 phrase.append(" *")
                 print(phrase)
                 if teamA.getFighter(number: position).isBonus() || teamB.getFighter(number: position).isBonus() {
-                    print(self.printBonus(teamA:teamA, teamB:teamB, positionFighter:position))
+                    print(Display.printBonus(teamA:teamA, teamB:teamB, positionFighter:position))
                 }
             }
             print("**************************************************************************************************************************************")

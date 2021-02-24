@@ -42,7 +42,6 @@ class Fighter:Character {
         self.decreaseLifeCumulate = 0
         super.init(identifier: id)
     }
-
 //MARK: - GET SET
     func setIsFinish() {
         decreaseLifeCumulate = 0

@@ -107,4 +107,49 @@ class Team {
         case .teamB: return "Equipe B"
         }
     }
+// MARK: - PARSER
+    func parserBattle(string: String, game:Game) -> (String) {
+        if string.count == 1 {
+            if string == "0" || string == "1"  || string == "2" {
+                if let number = Int(string) {
+                    switch game.teamActive {
+                    case .none:
+                        break
+                    case .teamA:
+                        return chooseFighter(team: game.teamA, number: number, game: game)
+                    case .teamB:
+                        return chooseFighter(team: game.teamB, number: number, game: game)
+                    }
+                }
+            }
+        } else {
+            game.parserMenu(string: string)
+            return ""
+        }
+        return "Je n'ai pas compris"
+    }
+    func chooseFighter(team:Team, number: Int, game:Game) -> String {
+        var battlePlayer = game.battlePlayerTeamA
+        if team.getIdentifier() == .teamB { battlePlayer = game.battlePlayerTeamB }
+
+        if !battlePlayer.getReady() {
+            if !team.getFighterIsDead(set: number) {
+                if team.getIdentifier() == .teamA {
+                    game.teamActive = .teamB
+                    game.battlePlayerTeamA = team.getFighter(number: number)
+                    game.battlePlayerTeamA.setReady(ready: true)
+                } else {
+                    game.teamActive = .teamA
+                    game.battlePlayerTeamB = team.getFighter(number: number)
+                    game.battlePlayerTeamB.setReady(ready: true)
+                }
+                var phrase: String = "L'\(team.getFrenchName(team: team.getIdentifier())) vient de choisir "
+                phrase.append("\(battlePlayer.getFrenchName())")
+                return phrase
+            } else {
+                return " \(team.getFighter(number: number).getFrenchName()) est déja mort ! "
+            }
+        }
+        return ""
+    }
 }

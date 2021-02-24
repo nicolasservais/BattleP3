@@ -18,15 +18,15 @@ class Game {
     /// When a weapon is used, is not available for other fighter.
     static var boardWeapons: [Weapon] = []
     /// The two team who are fighting.
-    private var teamA: Team
-    private var teamB: Team
+    var teamA: Team
+    var teamB: Team
     /// Stored the different phase of the game.
     private var statusGame: Status
-    private var teamActive: Team.Identifier
+    var teamActive: Team.Identifier
     private var lastTeamWinner: Team.Identifier
     /// When the battle starting, the two battlePlayer are fighting.
-    private var battlePlayerTeamA: Fighter
-    private var battlePlayerTeamB: Fighter
+    var battlePlayerTeamA: Fighter
+    var battlePlayerTeamB: Fighter
     private var loopAddWeapon: Bool
     private var loopAddName: Bool
     /// An array who stored all the names to control that not duplicate.
@@ -141,7 +141,7 @@ class Game {
             phrase.append("\(Display.printPlayerAlive(teamActive: teamActive, teamA:teamA, teamB:teamB)) ?")
             print(phrase)
             if let numberCharacter = readLine() {
-                print(parserBattle(string: numberCharacter))
+                print(teamA.parserBattle(string: numberCharacter, game:self))
             } else {
                 print("Je n'ai pas compris le choix du personnage")
             }
@@ -234,7 +234,7 @@ class Game {
             if let numberCharacter = readLine() {
                 print(" ")
                 print(parserCharacter(string: numberCharacter))
-                print("teamACount:\(teamA.getCount()) teamBCount:\(teamB.getCount())")
+                //print("teamACount:\(teamA.getCount()) teamBCount:\(teamB.getCount())")
                 print(" ")
             } else {
                 print("Je n'ai pas compris le choix du personnage")
@@ -280,7 +280,7 @@ class Game {
         return "ERROR"
     }
 // MARK: - PARSER
-    private func parserMenu(string: String) {
+    func parserMenu(string: String) {
         if string == "start" {
             if statusGame == .none {
                 resetBoards()
@@ -406,48 +406,6 @@ class Game {
             return""
         }
         return "ERROR in parserWeapon"
-    }
-    private func parserBattle(string: String) -> (String) {
-        if string.count == 1 {
-            if string == "0" || string == "1"  || string == "2" {
-                if let number = Int(string) {
-                    switch teamActive {
-                    case .none:
-                        break
-                    case .teamA:
-                        if !battlePlayerTeamA.getReady() {
-                            if !teamA.getFighterIsDead(set: number) {
-                                teamActive = .teamB
-                                battlePlayerTeamA = teamA.getFighter(number: number)
-                                battlePlayerTeamA.setReady(ready: true)
-                                var phrase: String = "L'\(teamA.getFrenchName(team: .teamA)) vient de choisir "
-                                phrase.append("\(battlePlayerTeamA.getFrenchName())")
-                                return phrase
-                            } else {
-                                return " \(teamA.getFighter(number: number).getFrenchName()) est déja mort ! "
-                            }
-                        }
-                    case .teamB:
-                        if !battlePlayerTeamB.getReady() {
-                            if !teamB.getFighterIsDead(set: number) {
-                                teamActive = .teamA
-                                battlePlayerTeamB = teamB.getFighter(number: number)
-                                battlePlayerTeamB.setReady(ready: true)
-                                var phrase: String = "L'\(teamB.getFrenchName(team: .teamA)) vient de choisir "
-                                phrase.append("\(battlePlayerTeamB.getFrenchName())")
-                                return phrase
-                        } else {
-                            return " \(teamB.getFighter(number: number).getFrenchName()) est déja mort ! "
-                        }
-                        }
-                    }
-                }
-            }
-        } else {
-            parserMenu(string: string)
-            return ""
-        }
-        return "Je n'ai pas compris"
     }
     private func parserInitStat() -> (String) {
         print("Etes vous sur de vouloir initialiser les statistiques (O N) ?")
